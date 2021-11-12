@@ -9,7 +9,7 @@ from tkinter import ttk
 # everything from chat.py file
 #from chat import *
 
-PORT = 40000
+PORT = 50000
 SERVER = "127.0.0.1"
 ADDRESS = (SERVER, PORT)
 FORMAT = "ascii"
