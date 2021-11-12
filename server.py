@@ -1,52 +1,101 @@
-import threading
+# import socket library
 import socket
 
-host = '127.0.0.1' #Host local
-porta = 40000 #Nao reservada
+# import threading library
+import threading
 
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #Cria conexao TCP
-server.bind((host, porta)) #associa IP e porta
-server.listen() #Inicia a espera
+# Choose a port that is free
+PORT = 5000
 
-clients = [] #Lista de clientes
-nomes = [] #Nomes dos usuários
+# An IPv4 address is obtained
+# for the server.
+SERVER = socket.gethostbyname(socket.gethostname())
 
-def transmitir(mensagem): #Mandar para todos os clientes a mensagem no chat
-    for client in clients:
-        client.send(mensagem)
+# Address is stored as a tuple
+ADDRESS = (SERVER, PORT)
 
-def receber(client): #Receber as mensagens dos clientes
-    while True:
-        try: #Enviar pra todos a mensagem recebida
-            mensagem = client.recv(1024)
-            transmitir(mensagem)
-            print(mensagem.decode('ascii'))
-        except: #Desconectar um client em caso de erro ou saída
-            i = clients.index(client) #Pega a posiçao do cliente
-            clients.remove(client)  #Tira ele da lista
-            client.close() #Encerra a conexão com ele
-            nome = nomes[i] #Acha o nome dele
-            transmitir('{} saiu do chat.'.format(nome).encode('ascii'))
-            nomes.remove(nome) # Tira o nome dele
+# the format in which encoding
+# and decoding will occur
+FORMAT = "utf-8"
 
-def conectar():
-    while True:
-        client, IP = server.accept()
-        print(f'{IP} está conectado')
+# Lists that will contains
+# all the clients connected to
+# the server and their names.
+clients, names = [], []
 
-        client.send('NOME'.encode('ascii'))
-        nome = client.recv(1024).decode('ascii')
-        nomes.append(nome)
-        clients.append(client)
+# Create a new socket for
+# the server
+server = socket.socket(socket.AF_INET,
+					socket.SOCK_STREAM)
 
-        print(f'O nome do novo usuario é: {nome}')
+# bind the address of the
+# server to the socket
+server.bind(ADDRESS)
 
-        transmitir(f'{nome} entrou no chat' .encode('ascii'))
-        client.send("Conectado!".encode('ascii'))
+# function to start the connection
+def startChat():
 
-        thread = threading.Thread(target=receber, args=(client,))
-        thread.start()
+	print("server is working on " + SERVER)
+	
+	# listening for connections
+	server.listen()
+	
+	while True:
+	
+		# accept connections and returns
+		# a new connection to the client
+		# and the address bound to it
+		conn, addr = server.accept()
+		conn.send("NAME".encode(FORMAT))
+		
+		# 1024 represents the max amount
+		# of data that can be received (bytes)
+		name = conn.recv(1024).decode(FORMAT)
+		
+		# append the name and client
+		# to the respective list
+		names.append(name)
+		clients.append(conn)
+		
+		print(f"Name is :{name}")
+		
+		# broadcast message
+		broadcastMessage(f"{name} has joined the chat!".encode(FORMAT))
+		
+		conn.send('Connection successful!'.encode(FORMAT))
+		
+		# Start the handling thread
+		thread = threading.Thread(target = handle,
+								args = (conn, addr))
+		thread.start()
+		
+		# no. of clients connected
+		# to the server
+		print(f"active connections {threading.activeCount()-1}")
 
-print('Servidor conectado! Esperando clientes...')
-conectar()
-        
+# method to handle the
+# incoming messages
+def handle(conn, addr):
+
+	print(f"new connection {addr}")
+	connected = True
+	
+	while connected:
+		# receive message
+		message = conn.recv(1024)
+		
+		# broadcast message
+		broadcastMessage(message)
+	
+	# close the connection
+	conn.close()
+
+# method for broadcasting
+# messages to the each clients
+def broadcastMessage(message):
+	for client in clients:
+		client.send(message)
+
+# call the method to
+# begin the communication
+startChat()
