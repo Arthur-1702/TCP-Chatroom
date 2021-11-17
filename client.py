@@ -1,102 +1,95 @@
-# import all the required modules
 import socket
 import threading
 from tkinter import *
 from tkinter import font
 from tkinter import ttk
 
-# import all functions /
-# everything from chat.py file
-#from chat import *
-
+# Porta livre e IP local 
 PORT = 50000
-SERVER = "127.0.0.1"
+SERVER = '127.0.0.1'
 ADDRESS = (SERVER, PORT)
-FORMAT = "ascii"
+# formato padrão pra encode e decode
+FORMAT = "utf-8"
 
-# Create a new client socket
-# and connect to the server
-client = socket.socket(socket.AF_INET,
-					socket.SOCK_STREAM)
+# cria um socket pro cliente e conecta no server
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(ADDRESS)
 
-
-# GUI class for the chat
+# classe de GUI do chat
 class GUI:
-	# constructor method
+	
 	def __init__(self):
 	
-		# chat window which is currently hidden
+		# janela do chat escondida
 		self.Window = Tk()
 		self.Window.withdraw()
 		
-		# login window
+		# janela de login (user)
 		self.login = Toplevel()
-		# set the title
+		# titulo
 		self.login.title("Login")
-		self.login.resizable(width = False,
-							height = False)
-		self.login.configure(width = 400,
-							height = 300)
-		# create a Label
+		# tamanho da tela
+		self.login.resizable(width = True, height = True)
+		self.login.configure(width = 850, height = 600)
+
+		# cria texto pedindo nome
 		self.pls = Label(self.login,
-					text = "Please login to continue",
+					text = "Digite seu usuário para entrar",
 					justify = CENTER,
-					font = "Helvetica 14 bold")
-		
-		self.pls.place(relheight = 0.15,
-					relx = 0.2,
+					font = "Adobe 30 bold")
+		self.pls.place(relheight = 0.1,
+					relx = 0.15,
 					rely = 0.07)
-		# create a Label
+		
+		# cria texto antes da caixa de texto
 		self.labelName = Label(self.login,
-							text = "Name: ",
-							font = "Helvetica 12")
+							text = "Usuário: ",
+							font = "Tekton 20")
 		
 		self.labelName.place(relheight = 0.2,
 							relx = 0.1,
-							rely = 0.2)
+							rely = 0.25)
 		
-		# create a entry box for
-		# tyoing the message
+		# cria a caixa de texto para nome
 		self.entryName = Entry(self.login,
-							font = "Helvetica 14")
+							font = "Fixedsys 20")
 		
 		self.entryName.place(relwidth = 0.4,
 							relheight = 0.12,
-							relx = 0.35,
-							rely = 0.2)
+							relx = 0.30,
+							rely = 0.3)
 		
-		# set the focus of the cursor
+		# da o foco do cursos de texto
 		self.entryName.focus()
 		
-		# create a Continue Button
-		# along with action
+		# cria o botão para entrar no chat e da o comando pra enviar o nome
 		self.go = Button(self.login,
-						text = "CONTINUE",
-						font = "Helvetica 14 bold",
-						command = lambda: self.goAhead(self.entryName.get()))
+						text = "ENTRAR",
+						font = "Fixedsys 20 bold",
+						command = lambda: self.avançar(self.entryName.get()))
 		
 		self.go.place(relx = 0.4,
 					rely = 0.55)
 		self.Window.mainloop()
 
-	def goAhead(self, name):
+	# vai do login para a segunda tela (chat)
+	def avançar(self, name):
 		self.login.destroy()
 		self.layout(name)
 		
-		# the thread to receive messages
+		# a thread para receber mensagens
 		rcv = threading.Thread(target=self.receive)
 		rcv.start()
 
-	# The main layout of the chat
+	# tela do chat
 	def layout(self,name):
 	
 		self.name = name
-		# to show chat window
+		# mostra a tela do chat
 		self.Window.deiconify()
-		self.Window.title("CHATROOM")
-		self.Window.resizable(width = False,
-							height = False)
+		self.Window.title("CHAT")
+		self.Window.resizable(width = True,
+							height = True)
 		self.Window.configure(width = 470,
 							height = 550,
 							bg = "#17202A")
@@ -218,5 +211,3 @@ class GUI:
 
 # create a GUI class object
 g = GUI()
-
-
