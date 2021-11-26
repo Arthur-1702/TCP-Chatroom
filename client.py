@@ -87,17 +87,17 @@ class GUI:
 		self.name = name
 		# mostra a tela do chat
 		self.Window.deiconify()
-		self.Window.title("CHAT")
+		self.Window.title("Whatsapp 2")
 		self.Window.resizable(width = True,
 							height = True)
 		self.Window.configure(width = 470,
 							height = 550,
-							bg = "#17202A")
+							bg = "#003b86")
 		self.labelHead = Label(self.Window,
-							bg = "#17202A",
+							bg = "#003b86",
 							fg = "#EAECEE",
 							text = self.name ,
-							font = "Helvetica 13 bold",
+							font = "Ubuntu 13 bold",
 							pady = 5)
 		
 		self.labelHead.place(relwidth = 1)
@@ -112,9 +112,9 @@ class GUI:
 		self.textCons = Text(self.Window,
 							width = 20,
 							height = 2,
-							bg = "#17202A",
+							bg = "#17204e",
 							fg = "#EAECEE",
-							font = "Helvetica 14",
+							font = "Ubuntu 14",
 							padx = 5,
 							pady = 5)
 		
@@ -130,12 +130,11 @@ class GUI:
 							rely = 0.825)
 		
 		self.entryMsg = Entry(self.labelBottom,
-							bg = "#2C3E50",
+							bg = "#2c3e8e",
 							fg = "#EAECEE",
-							font = "Helvetica 13")
+							font = "Ubuntu 13")
 		
-		# place the given widget
-		# into the gui window
+		# coloca a ferramenta do chat na GUI
 		self.entryMsg.place(relwidth = 0.74,
 							relheight = 0.06,
 							rely = 0.008,
@@ -143,12 +142,12 @@ class GUI:
 		
 		self.entryMsg.focus()
 		
-		# create a Send Button
+		# cria botão enviar
 		self.buttonMsg = Button(self.labelBottom,
-								text = "Send",
-								font = "Helvetica 10 bold",
+								text = "Enviar",
+								font = "Ubuntu 10 bold",
 								width = 20,
-								bg = "#ABB2B9",
+								bg = "#2c7d8e",
 								command = lambda : self.sendButton(self.entryMsg.get()))
 		
 		self.buttonMsg.place(relx = 0.77,
@@ -158,11 +157,10 @@ class GUI:
 		
 		self.textCons.config(cursor = "arrow")
 		
-		# create a scroll bar
+		# cria o scroll
 		scrollbar = Scrollbar(self.textCons)
 		
-		# place the scroll bar
-		# into the gui window
+		# coloca o scroll na lateral do chat
 		scrollbar.place(relheight = 1,
 						relx = 0.974)
 		
@@ -170,7 +168,7 @@ class GUI:
 		
 		self.textCons.config(state = DISABLED)
 
-	# function to basically start the thread for sending messages
+	# começa a thread de enviar mensagens no botão
 	def sendButton(self, msg):
 		self.textCons.config(state = DISABLED)
 		self.msg=msg
@@ -178,30 +176,29 @@ class GUI:
 		snd= threading.Thread(target = self.sendMessage)
 		snd.start()
 
-	# function to receive messages
+	# receber mensagens
 	def receive(self):
 		while True:
 			try:
 				message = client.recv(1024).decode(FORMAT)
 				
-				# if the messages from the server is NAME send the client's name
-				if message == 'NAME':
+				# responde a requisição de nome do server
+				if message == 'NOME':
 					client.send(self.name.encode(FORMAT))
 				else:
-					# insert messages to text box
+					# coloca as mensagens na caixa de texto
 					self.textCons.config(state = NORMAL)
-					self.textCons.insert(END,
-										message+"\n\n")
+					self.textCons.insert(END, message+"\n\n")
 					
 					self.textCons.config(state = DISABLED)
 					self.textCons.see(END)
 			except:
-				# an error will be printed on the command line or console if there's an error
-				print("An error occured!")
+				# caso der erro
+				print("Ocorreu um erro!")
 				client.close()
 				break
 		
-	# function to send messages
+	# função para enviar as mensagens
 	def sendMessage(self):
 		self.textCons.config(state=DISABLED)
 		while True:
@@ -209,5 +206,5 @@ class GUI:
 			client.send(message.encode(FORMAT))
 			break
 
-# create a GUI class object
+# cria a GUI
 g = GUI()

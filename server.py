@@ -27,7 +27,7 @@ def esperaConexao():
 	
 		# aceita as conexões e recebe o endereço
 		cliente, ip = server.accept()
-		cliente.send("NAME".encode(FORMAT))
+		cliente.send("NOME".encode(FORMAT))
 		
 		# recebe o nome do cliente com limite maximo de bytes
 		user = cliente.recv(1024).decode(FORMAT)
